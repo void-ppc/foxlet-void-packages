@@ -6,22 +6,23 @@ _glibc_version=2.29
 _linux_version=4.19
 
 _triplet=powerpc-linux-gnu
-_archflags="-mcpu=powerpc -msecure-plt"
+_archflags="-mcpu=powerpc"
 _sysroot="/usr/${_triplet}"
 
 pkgname=cross-${_triplet}
 version=0.31
 revision=1
 short_desc="GNU Cross toolchain for the ${_triplet} target (binutils/gcc/glibc)"
-maintainer="Thomas Batten <stenstorpmc@gmail.com>"
+maintainer="Foxlet <foxlet@furcode.co>"
 homepage="http://www.voidlinux.org"
-license="GPL-2.0-or-later, GPL-3.0-or-later, LGPL-2.1-or-later"
+license="GPL-3, GPL-2, LGPL-2.1"
 distfiles="
  ${GNU_SITE}/binutils/binutils-${_binutils_version}.tar.xz
  ${GNU_SITE}/gcc/gcc-${_gcc_version}/gcc-${_gcc_version}.tar.xz
  ${GNU_SITE}/glibc/glibc-${_glibc_version}.tar.xz
  ${KERNEL_SITE}/kernel/v4.x/linux-${_linux_version}.tar.xz"
-checksum="0ab6c55dd86a92ed561972ba15b9b70a8b9f75557f896446c82e8b36e473ee04
+checksum="
+ 0ab6c55dd86a92ed561972ba15b9b70a8b9f75557f896446c82e8b36e473ee04
  79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0
  f3eeb8d57e25ca9fc13c2af3dae97754f9f643bc69229546828e3a240e2af04b
  0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1"
@@ -35,7 +36,7 @@ makedepends="isl15-devel libmpc-devel zlib-devel"
 depends="${pkgname}-libc-${version}_${revision}"
 nostrip_files="libcaf_single.a libgcc.a libgcov.a libgcc_eh.a
  libgnarl_pic.a libgnarl.a libgnat_pic.a libgnat.a"
-archs="i686 x86_64 ppc64le ppc64"
+archs="i686 x86_64"
 
 _apply_patch() {
 	local args="$1" pname="$(basename $2)"
@@ -79,7 +80,6 @@ _binutils_build() {
 	_args+=" --disable-werror"
 	_args+=" --disable-gold"
 	_args+=" --with-system-zlib"
-	_args+=" --enable-secureplt"
 	../binutils-${_binutils_version}/configure ${_args}
 
 	make configure-host && make ${makejobs}
@@ -121,7 +121,6 @@ _gcc_bootstrap() {
 	_args+=" --disable-multilib"
 	_args+=" --with-gnu-ld"
 	_args+=" --with-gnu-as"
-	_args+=" --enable-secureplt"
 
 	../gcc-${_gcc_version}/configure ${_args}
 
@@ -189,7 +188,7 @@ _glibc_build() {
 	export CC="${_triplet}-gcc" CXX="${_triplet}-g++" LD="${_triplet}-ld" \
 		AS="${_triplet}-as" CPP="${_triplet}-cpp" \
 		NM="${_triplet}-nm"
-	export CFLAGS="-O1 -pipe -Wno-error ${_archflags}"
+	export CFLAGS="-Os -pipe -Wno-error ${_archflags}"
 
 	_args="--prefix=/usr"
 	_args+=" --libdir=/usr/lib"
@@ -262,7 +261,6 @@ _gcc_build() {
 	_args+=" --disable-libstdcxx-pch"
 	_args+=" --enable-libstdcxx-time"
 	_args+=" --with-linker-hash-style=gnu"
-	_args+=" --enable-secureplt"
 
 	../gcc-${_gcc_version}/configure ${_args}
 
@@ -328,14 +326,14 @@ do_install() {
 	cd ${wrksrc}/glibc-build
 	make install_root=${DESTDIR}/${_sysroot} install install-headers
 
-        # symlinks for gnarl and gnat shared libraries
-        _majorver=${_gcc_version%.*.*}
-        _adalib=usr/lib/gcc/${_triplet}/${_gcc_version}/adalib
-        mv -v ${DESTDIR}/${_adalib}/libgnarl-${_majorver}.so ${DESTDIR}/${_sysroot}/usr/lib
-        mv -v ${DESTDIR}/${_adalib}/libgnat-${_majorver}.so ${DESTDIR}/${_sysroot}/usr/lib
-        ln -svf libgnarl-${_majorver}.so libgnarl.so
-        ln -svf libgnat-${_majorver}.so libgnat.so
-        rm -vf ${DESTDIR}/${_adalib}/libgna{rl,t}.so
+	# symlinks for gnarl and gnat shared libraries
+	_majorver=${_gcc_version%.*.*}
+	_adalib=usr/lib/gcc/${_triplet}/${_gcc_version}/adalib
+	mv -v ${DESTDIR}/${_adalib}/libgnarl-${_majorver}.so ${DESTDIR}/${_sysroot}/usr/lib
+	mv -v ${DESTDIR}/${_adalib}/libgnat-${_majorver}.so ${DESTDIR}/${_sysroot}/usr/lib
+	ln -svf libgnarl-${_majorver}.so libgnarl.so
+	ln -svf libgnat-${_majorver}.so libgnat.so
+	rm -vf ${DESTDIR}/${_adalib}/libgna{rl,t}.so
 
 	# Remove unnecessary stuff
 	rm -f ${DESTDIR}/usr/lib*/libiberty.a
