@@ -34,12 +34,8 @@ if [ "$build_option_assembly" ]; then
 fi
 
 case "$XBPS_TARGET_MACHINE" in
-	ppc64*)
-		# altivec does not build without power8 being enabled
-		configure_args+=" -DENABLE_ALTIVEC=$(vopt_if altivec ON OFF)
-		 -DCPU_POWER8=$(vopt_if altivec ON OFF)"
-		;;
-	*) configure_args+=" -DENABLE_ASSEMBLY=$(vopt_if assembly ON OFF)" ;;
+	mips*) configure_args+=" -DCMAKE_SYSTEM_PROCESSOR=mips32r2" ;;
+	ppc*) configure_args+=" -DCMAKE_SYSTEM_PROCESSOR=powerpc" ;;
 esac
 
 pre_configure() {
