@@ -16,7 +16,7 @@ do_patch() {
 			armv*)
 				_MESON_CPU_FAMILY=arm
 				;;
-			ppc|ppc-musl)
+			ppc)
 				_MESON_TARGET_ENDIAN=big
 				_MESON_CPU_FAMILY=ppc
 				;;
