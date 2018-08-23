@@ -42,7 +42,7 @@ i686*|x86_64*)
 ppc*)
 	# Enable all ppc drivers.
 	configure_args+=" -Dgallium-drivers=r300,r600,radeonsi,swrast,nouveau,virgl"
-	configure_args+=" -Ddri-drivers=r100,r200,nouveau"
+	configure_args+=" -Ddri-drivers=r100,r200,radeon,nouveau"
 	configure_args+=" -Dvulkan-drivers=amd"
 	configure_args+=" -Ddri3=true"
 	hostmakedepends+=" clang"
@@ -204,7 +204,8 @@ mesa-nouveau-dri_package() {
 		vmove "usr/lib/xorg/modules/drivers/nouveau*"
 		vmove "usr/lib/dri/nouveau*"
 		case "$XBPS_TARGET_MACHINE" in
-			aarch64*|ppc*) ;;
+			aarch64*) ;;
+			ppc* ) ;;
 			*) vmove usr/lib/gallium-pipe/pipe_nouveau.so ;;
 		esac
 	}
