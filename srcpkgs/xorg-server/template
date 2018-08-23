@@ -42,9 +42,10 @@ i686*|x86_64*|aarch64*|ppc*)
 	;;
 ppc*)
 	# Wayland may not work on ppc?
-	configure_args+=" --enable-glamor --enable-dri2 --enable-dri3 --enable-glx --disable-xwayland"
+	configure_args+=" -Dglamor=true -Ddri2=true -Ddri3=true -Dglx=true -Dxwayland=true"
 	makedepends+=" MesaLib-devel"
 	replaces+=" glamor-egl>=0"
+	subpackages+=" xorg-server-xwayland"
 	;;
 *)
 	# Enable dri2 on !x86 via libdri.
