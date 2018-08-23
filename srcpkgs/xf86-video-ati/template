@@ -2,7 +2,7 @@
 pkgname=xf86-video-ati
 version=19.0.1
 revision=1
-archs="i686* x86_64* ppc ppc-musl ppc64*"
+only_for_archs="i686 i686-musl x86_64 x86_64-musl ppc"
 build_style=gnu-configure
 hostmakedepends="pkg-config"
 makedepends="xorgproto eudev-libudev-devel libpciaccess-devel
